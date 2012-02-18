@@ -14,7 +14,16 @@
 
 {{/subviews}}
 
+    [self setNeedsLayout];
+
     return self;
+}
+
+- (void)layoutSubviews
+{
+{{#layoutUpdaters}}
+    // OHAI
+{{/layoutUpdaters}}
 }
 
 @end

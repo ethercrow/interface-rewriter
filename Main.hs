@@ -1,33 +1,52 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
-import InternalRepresentation
-import CodeGen
+import System.Environment
 import System.Environment.Executable 
 import System.FilePath
 import System.Directory
+import System.Exit
 import qualified Data.ByteString.Lazy as L
+import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Map as M
 import Data.List
+import Data.Maybe
 import Control.Monad
+
+import JSONReader
+import CodeGen
+import Validation
 
 main :: IO ()
 main = do
-    templates <- collectTemplates
+    maybeFilename <- fmap listToMaybe getArgs 
 
-    let subsubview = View "someButton" (Rectangle 10 10 30 30) []
-        subview1 = View "shinyHeader" (Rectangle 100 100 300 100) [subsubview]
-        subview2 = View "shinyFooter" (Rectangle 100 500 300 100) []
-        view = View "ShinyView" (Rectangle 0 0 0 0) [subview1, subview2]
+    unless (isJust maybeFilename) $ do
+        putStrLn "Input file required"
+        exitFailure
+
+    maybeView <- fromJSONFile $ fromJust maybeFilename
+
+    unless (isJust maybeView) $ do
+        putStrLn "Parsing input file failed"
+        exitFailure
+
+    let view = fromJust maybeView
+
+    case validateView view of
+        ValidationError e -> do
+            putStrLn $ "View validation error: " ++ e
+            exitFailure
+        _ -> return ()
+
+    templates <- collectTemplates
 
     putStrLn "Header"
     putStrLn "======"
-    L.putStrLn $ genHeader templates view
+    L8.putStrLn $ genHeader templates view
 
     putStrLn "Implementation"
     putStrLn "=============="
-    L.putStrLn $ genImplementation templates view
+    L8.putStrLn $ genImplementation templates view
 
 collectTemplates :: IO TemplateMap
 collectTemplates = do

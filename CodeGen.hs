@@ -9,7 +9,7 @@ import Data.Maybe
 import qualified Data.Map as M
 import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Lazy.Char8 as L8
-import Control.Monad.ST
+import System.IO.Unsafe
 import Data.Data
 
 import InternalRepresentation
@@ -17,7 +17,7 @@ import InternalRepresentation
 type TemplateMap = M.Map String L.ByteString
 
 render :: L.ByteString -> MuContext IO -> L.ByteString
-render templateString ctx = runST $ unsafeIOToST $ hastacheStr defaultConfig
+render templateString ctx = unsafePerformIO $ hastacheStr defaultConfig
                                     (encodeStr (L8.unpack templateString)) ctx
 
 genHeader :: TemplateMap -> View -> L.ByteString
@@ -28,7 +28,7 @@ genHeader tm v = render template context
 data Subview = Subview {
     subviewParent :: L.ByteString,
     subviewName :: L.ByteString,
-    subviewFrame :: Rectangle
+    subviewFrame :: Rectangle Int
 } deriving (Data, Typeable)
 
 data ImplementationContext = ImplementationContext {
@@ -47,10 +47,12 @@ genImplementation tm v = render template context
 flattenSubviews :: View -> [Subview]
 flattenSubviews = flattenSubviews' True
 
-flattenSubviews' isTopmost (View pname _ vs) = map mkSubview vs ++
-                                               concatMap (flattenSubviews' False) vs
-    where mkSubview (View vname vframe _) = Subview {
-              subviewParent = if isTopmost then "self" else pname,
-              subviewName = vname,
-              subviewFrame = vframe
+flattenSubviews' :: Bool -> View -> [Subview]
+flattenSubviews' isTopmost pv = map mkSubview (viewSubviews pv) ++
+                               concatMap (flattenSubviews' False) (viewSubviews pv)
+    where mkSubview v | isJust $ viewFrame v = Subview {
+              subviewParent = if isTopmost then "self" else viewName v,
+              subviewName = viewName v,
+              subviewFrame = fromJust $ viewFrame v 
           }
+          mkSubview _ = undefined
