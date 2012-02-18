@@ -1,7 +1,11 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module CodeGen where
+module CodeGen (
+    genHeader,
+    genImplementation,
+    TemplateMap
+) where
 
 import Text.Hastache
 import Text.Hastache.Context

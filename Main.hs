@@ -33,8 +33,8 @@ main = do
     let view = fromJust maybeView
 
     case validateView view of
-        ValidationError e -> do
-            putStrLn $ "View validation error: " ++ e
+        Just msg -> do
+            putStrLn $ "View validation error: " ++ msg
             exitFailure
         _ -> return ()
 

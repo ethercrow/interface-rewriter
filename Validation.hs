@@ -1,18 +1,24 @@
 
-module Validation where
+module Validation (
+    ValidationResult,
+    validateView
+) where
 
 import InternalRepresentation
 import Data.Maybe
+import Control.Monad
+import Data.ByteString.Lazy.Char8(unpack)
 
--- maybe just use Maybe String?
-data ValidationResult = OK
-                      | ValidationError String
+type ValidationResult = Maybe String
 
 validateView :: View -> ValidationResult
-validateView _ = OK
+validateView v = msum $ (map (checkFrame v) (viewSubviews v) ++ map validateView (viewSubviews v))
+          
 
-foo :: View -> View -> ValidationResult
-foo parent child | viewLayout parent == Manual && isJust (viewFrame child) = OK
-                 | viewLayout parent /= Manual && isNothing (viewFrame child) = OK
-foo _ _ = ValidationError "dunno"
+checkFrame :: View -> View -> ValidationResult
+checkFrame parent child | viewLayout parent == Manual && isNothing (viewFrame child) =
+                        Just $ unpack (viewName child) ++ " must have frame"
+                 | viewLayout parent /= Manual && isJust (viewFrame child) =
+                        Just $ unpack (viewName child) ++ " must have no frame"
+checkFrame _ _ = Nothing
                  
