@@ -1,13 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module JSONReader where
+module JSONReader (
+    fromJSONFile
+) where
 
 import Data.Aeson (decode)
 import Data.ByteString.Lazy as L
 
-import InternalRepresentation
+import Types
 
-fromJSONFile :: FilePath -> IO (Maybe View)
+fromJSONFile :: FilePath -> IO (Maybe InputView)
 fromJSONFile filename = do
     s <- L.readFile filename
     return $ decode s

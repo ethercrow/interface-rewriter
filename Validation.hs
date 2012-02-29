@@ -4,21 +4,41 @@ module Validation (
     validateView
 ) where
 
-import InternalRepresentation
+import Types
 import Data.Maybe
 import Control.Monad
 import Data.ByteString.Lazy.Char8(unpack)
 
 type ValidationResult = Maybe String
 
-validateView :: View -> ValidationResult
-validateView v = msum $ (map (checkFrame v) (viewSubviews v) ++ map validateView (viewSubviews v))
-          
+validateView :: InputView -> ValidationResult
+validateView v = msum $
+                 concat $
+                 map (\sv -> [checkFrame v sv, validateView sv]) svs
+                 where svs = ivSubviews v
 
-checkFrame :: View -> View -> ValidationResult
-checkFrame parent child | viewLayout parent == Manual && isNothing (viewFrame child) =
-                        Just $ unpack (viewName child) ++ " must have frame"
-                 | viewLayout parent /= Manual && isJust (viewFrame child) =
-                        Just $ unpack (viewName child) ++ " must have no frame"
+checkFrame :: InputView -> InputView -> ValidationResult
+checkFrame parent child | ivLayout parent == Manual && isNothing (ivX child) =
+                            Just $ unpack (ivName child) ++ " must have x"
+                        | ivLayout parent == Manual && isNothing (ivY child) =
+                            Just $ unpack (ivName child) ++ " must have y"
+                        | ivLayout parent == Manual && isNothing (ivWidth child) =
+                            Just $ unpack (ivName child) ++ " must have width"
+                        | ivLayout parent == Manual && isNothing (ivHeight child) =
+                            Just $ unpack (ivName child) ++ " must have height"
+
+                        | ivLayout parent == Horizontal && isJust (ivX child) =
+                            Just $ unpack (ivName child) ++ " must have no x"
+                        | ivLayout parent == Horizontal && isJust (ivY child) =
+                            Just $ unpack (ivName child) ++ " must have no y"
+                        | ivLayout parent == Horizontal && isJust (ivHeight child) =
+                            Just $ unpack (ivName child) ++ " must have no height"
+
+                        | ivLayout parent == Vertical && isJust (ivX child) =
+                            Just $ unpack (ivName child) ++ " must have no x"
+                        | ivLayout parent == Vertical && isJust (ivY child) =
+                            Just $ unpack (ivName child) ++ " must have no y"
+                        | ivLayout parent == Vertical && isJust (ivWidth child) =
+                            Just $ unpack (ivName child) ++ " must have no width"
 checkFrame _ _ = Nothing
-                 
+
