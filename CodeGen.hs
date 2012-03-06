@@ -53,7 +53,7 @@ flattenSubviews' :: Bool -> View -> [Subview]
 flattenSubviews' isTopmost pv = map mkSubview (vSubviews pv) ++
                                concatMap (flattenSubviews' False) (vSubviews pv)
     where mkSubview v = Subview {
-              subviewParent = if isTopmost then "self" else vName v,
+              subviewParent = if isTopmost then "self" else vName pv,
               subviewName = vName v,
               subviewFrame = vFrame v
           }
