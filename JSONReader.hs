@@ -13,4 +13,3 @@ fromJSONFile :: FilePath -> IO (Maybe InputView)
 fromJSONFile filename = do
     s <- L.readFile filename
     return $ decode s
-

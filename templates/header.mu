@@ -1,4 +1,4 @@
 
-@interface {{ name }}
+@interface {{ vName }}: {{ vClass }}
 @end
 

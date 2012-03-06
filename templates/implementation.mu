@@ -1,6 +1,6 @@
-#import "{{ master.name }}.h"
+#import "{{ master.vName }}.h"
 
-@implementation {{ master.name }}
+@implementation {{ master.vName }}
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -9,7 +9,7 @@
     }
 
 {{#subviews}}
-    UIView *{{subviewName}} = [[UIView alloc] initWithFrame:CGRectMake({{subviewFrame.x}}, {{subviewFrame.y}}, {{subviewFrame.w}}, {{subviewFrame.h}})];
+    {{subviewClass}} *{{subviewName}} = [[{{subviewClass}} alloc] initWithFrame:CGRectMake({{subviewFrame.rectX}}, {{subviewFrame.rectY}}, {{subviewFrame.rectW}}, {{subviewFrame.rectH}})];
     [{{subviewParent}} addSubview:{{subviewName}}];
 
 {{/subviews}}

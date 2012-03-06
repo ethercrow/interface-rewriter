@@ -30,6 +30,7 @@ genHeader tm v = render template context
 data Subview = Subview {
     subviewParent :: L.ByteString,
     subviewName :: L.ByteString,
+    subviewClass :: L.ByteString,
     subviewFrame :: Rectangle Int
 } deriving (Data, Typeable)
 
@@ -55,5 +56,6 @@ flattenSubviews' isTopmost pv = map mkSubview (vSubviews pv) ++
     where mkSubview v = Subview {
               subviewParent = if isTopmost then "self" else vName pv,
               subviewName = vName v,
+              subviewClass = vClass v,
               subviewFrame = vFrame v
           }

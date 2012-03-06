@@ -11,6 +11,7 @@ import CodeGen
 import Validation
 import Tiling
 import Utils
+import Types
 
 main :: IO ()
 main = do
@@ -34,7 +35,7 @@ main = do
             exitFailure
         _ -> return ()
 
-    let view = performMasterLayout inputView
+    let view = performLayout Nothing inputView
 
     templates <- collectTemplates
 

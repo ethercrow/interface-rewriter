@@ -41,4 +41,3 @@ checkFrame parent child | ivLayout parent == Manual && isNothing (ivX child) =
                         | ivLayout parent == Vertical && isJust (ivWidth child) =
                             Just $ unpack (ivName child) ++ " must have no width"
 checkFrame _ _ = Nothing
-
