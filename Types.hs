@@ -68,7 +68,7 @@ instance FromJSON InputView where
                                      <*> o .:? "width"
                                      <*> o .:? "height"
 
-                                     <*> o .: "subviews"
+                                     <*> o .:? "subviews" .!= []
     parseJSON _ = fail "expected object"
 
 instance FromJSON Layout where
@@ -76,4 +76,3 @@ instance FromJSON Layout where
     parseJSON "vertical" = return Vertical
     parseJSON "horizontal" = return Horizontal
     parseJSON _ = fail "unknown layout"
-
