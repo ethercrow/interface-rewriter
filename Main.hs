@@ -1,20 +1,16 @@
 module Main where
 
-import System.Environment
-import System.Environment.Executable 
-import System.FilePath
-import System.Directory
-import System.Exit
-import qualified Data.ByteString.Lazy as L
-import qualified Data.ByteString.Lazy.Char8 as L8
-import qualified Data.Map as M
-import Data.List
-import Data.Maybe
 import Control.Monad
+import Data.Maybe
+import System.Environment
+import System.Exit
+import qualified Data.ByteString.Lazy.Char8 as L8
 
 import JSONReader
 import CodeGen
 import Validation
+import Tiling
+import Utils
 
 main :: IO ()
 main = do
@@ -30,13 +26,15 @@ main = do
         putStrLn "Parsing input file failed"
         exitFailure
 
-    let view = fromJust maybeView
+    let inputView = fromJust maybeView
 
-    case validateView view of
+    case validateView inputView of
         Just msg -> do
             putStrLn $ "View validation error: " ++ msg
             exitFailure
         _ -> return ()
+
+    let view = performMasterLayout inputView
 
     templates <- collectTemplates
 
@@ -47,15 +45,3 @@ main = do
     putStrLn "Implementation"
     putStrLn "=============="
     L8.putStrLn $ genImplementation templates view
-
-collectTemplates :: IO TemplateMap
-collectTemplates = do
-    programDirectory <- fmap fst splitExecutablePath
-    let templateDirectory = programDirectory </> "templates"
-
-    templateFilenames <- liftM (filter (isSuffixOf ".mu")) $
-                         getDirectoryContents templateDirectory
-
-    templates <- mapM (L.readFile . (templateDirectory </>)) templateFilenames
-    return $ M.fromList $ zip templateFilenames templates
-    

@@ -7,55 +7,38 @@ module CodeGen (
     TemplateMap
 ) where
 
+import Data.Data
+import Data.Maybe
+import System.IO.Unsafe
 import Text.Hastache
 import Text.Hastache.Context
-import Data.Maybe
-import qualified Data.Map as M
 import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Lazy.Char8 as L8
-import System.IO.Unsafe
-import Data.Data
+import qualified Data.Map as M
 
 import Types
-
-type TemplateMap = M.Map String L.ByteString
 
 render :: L.ByteString -> MuContext IO -> L.ByteString
 render templateString ctx = unsafePerformIO $ hastacheStr defaultConfig
                                     (encodeStr (L8.unpack templateString)) ctx
 
-genHeader :: TemplateMap -> InputView -> L.ByteString
+genHeader :: TemplateMap -> View -> L.ByteString
 genHeader tm v = render template context
     where template = fromJust $ M.lookup "header.mu" tm
           context = mkGenericContext v
 
-data Rectangle t = Rectangle {
-    x :: t,
-    y :: t,
-    w :: t,
-    h :: t
-} deriving (Data, Typeable)
-
-fromArray :: [t] -> Rectangle t
-fromArray xs = Rectangle {
-    x = xs !! 0,
-    y = xs !! 1,
-    w = xs !! 2,
-    h = xs !! 3
-}
-
 data Subview = Subview {
     subviewParent :: L.ByteString,
-    subivName :: L.ByteString,
+    subviewName :: L.ByteString,
     subviewFrame :: Rectangle Int
 } deriving (Data, Typeable)
 
 data ImplementationContext = ImplementationContext {
-    master :: InputView,
+    master :: View,
     subviews :: [Subview]
 } deriving (Data, Typeable)
 
-genImplementation :: TemplateMap -> InputView -> L.ByteString
+genImplementation :: TemplateMap -> View -> L.ByteString
 genImplementation tm v = render template context
     where template = fromJust $ M.lookup "implementation.mu" tm
           context = mkGenericContext ImplementationContext {
@@ -63,14 +46,14 @@ genImplementation tm v = render template context
               subviews = flattenSubviews v
           }
 
-flattenSubviews :: InputView -> [Subview]
+flattenSubviews :: View -> [Subview]
 flattenSubviews = flattenSubviews' True
 
-flattenSubviews' :: Bool -> InputView -> [Subview]
-flattenSubviews' isTopmost pv = map mkSubview (ivSubviews pv) ++
-                               concatMap (flattenSubviews' False) (ivSubviews pv)
+flattenSubviews' :: Bool -> View -> [Subview]
+flattenSubviews' isTopmost pv = map mkSubview (vSubviews pv) ++
+                               concatMap (flattenSubviews' False) (vSubviews pv)
     where mkSubview v = Subview {
-              subviewParent = if isTopmost then "self" else ivName v,
-              subivName = ivName v,
-              subviewFrame = fromArray $ map fromJust [ivX v, ivY v, ivWidth v, ivHeight v]
+              subviewParent = if isTopmost then "self" else vName v,
+              subviewName = vName v,
+              subviewFrame = vFrame v
           }

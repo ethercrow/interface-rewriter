@@ -4,17 +4,17 @@ module Validation (
     validateView
 ) where
 
-import Types
-import Data.Maybe
 import Control.Monad
 import Data.ByteString.Lazy.Char8(unpack)
+import Data.Maybe
+
+import Types
 
 type ValidationResult = Maybe String
 
 validateView :: InputView -> ValidationResult
 validateView v = msum $
-                 concat $
-                 map (\sv -> [checkFrame v sv, validateView sv]) svs
+                 concatMap (\sv -> [checkFrame v sv, validateView sv]) svs
                  where svs = ivSubviews v
 
 checkFrame :: InputView -> InputView -> ValidationResult
