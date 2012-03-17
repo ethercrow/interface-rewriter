@@ -53,7 +53,7 @@ data Rectangle t = Rectangle {
 
 fromArray :: [t] -> Rectangle t
 fromArray xs = Rectangle {
-    rectX = xs !! 0,
+    rectX = head xs,
     rectY = xs !! 1,
     rectW = xs !! 2,
     rectH = xs !! 3

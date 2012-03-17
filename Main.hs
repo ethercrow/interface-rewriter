@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 import Control.Monad
@@ -11,7 +13,6 @@ import CodeGen
 import Validation
 import Tiling
 import Utils
-import Types
 
 main :: IO ()
 main = do
@@ -31,7 +32,7 @@ main = do
 
     case validateView inputView of
         Just msg -> do
-            putStrLn $ "View validation error: " ++ msg
+            L8.putStrLn $ L8.concat ["View validation error: ", msg]
             exitFailure
         _ -> return ()
 
