@@ -1,0 +1,53 @@
+{
+    "name": "ShinyView",
+    "layout": "vertical",
+
+    "x":0,
+    "y":0,
+    "width":320,
+    "height":480,
+
+    "subviews": [
+        {
+            "name": "shinyHeader",
+            "height": 10,
+            "subviews": [
+                {
+                    "name": "headerButton",
+                    "class": "MyButton",
+                    "x":0,
+                    "y":0,
+                    "width":50,
+                    "height":50,
+                    "subviews": []
+                }
+            ]
+        },
+        {
+            "name": "shinyFooter",
+            "layout": "horizontal",
+            "subviews": [
+                {
+                    "name": "footerNote1",
+                    "class" : "UILabel",
+                    "text": "Lorem"
+                },
+                {
+                    "name": "footerNote2",
+                    "class" : "UILabel",
+                    "text": "Ipsum"
+                },
+                {
+                    "name": "footerNote3",
+                    "class" : "UILabel",
+                    "text": "Dolor"
+                },
+                {
+                    "name": "footerNote4",
+                    "class" : "UILabel",
+                    "text": "Sit"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "name": "ShinyView",
+    "layout": "vertical",
+    "subviews": [
+        {
+            "name": "shinyHeader",
+            "frame": [1, 1, 1, 1],
+            "subviews": [
+                {
+                    "name": "headerButton",
+                    "class": "MyButton",
+                    "frame": [0, 0, 50, 50],
+                    "subviews": []
+                }
+            ]
+        },
+        {
+            "name": "shinyFooter",
+            "subviews": []
+        }
+    ]
+}

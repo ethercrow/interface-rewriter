@@ -1,0 +1,26 @@
+ShinyView {
+    layout: vertical
+
+    x:0
+    y:0
+    width:320
+    height:480
+
+    shinyHeader {
+        height: 10
+
+        UIButton headerButton {
+            x: 0, y: 0
+            width: 0, height: 0
+        }
+    }
+
+    shinyFooter {
+        layout: horizontal
+
+        UILabel footerNote1 { text: "Lorem" }
+        UILabel footerNote2 { text: "Ipsum" }
+        UILabel footerNote3 { text: "Dolor" }
+        UILabel footerNote4 { text: "Sit" }
+    }
+}
