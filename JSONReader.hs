@@ -5,11 +5,12 @@ module JSONReader (
 ) where
 
 import Data.Aeson (decode)
-import Data.ByteString.Lazy as L
+import Data.Maybe
+import qualified Data.ByteString.Lazy as L
 
 import Types
 
-fromJSONFile :: FilePath -> IO (Maybe InputView)
+fromJSONFile :: FilePath -> IO (Either L.ByteString InputView)
 fromJSONFile filename = do
     s <- L.readFile filename
-    return $ decode s
+    return $ maybe (Left "JSON parsing failed") (Right . fromJust) (decode s)

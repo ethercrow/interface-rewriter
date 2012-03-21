@@ -3,16 +3,19 @@
 module Main where
 
 import Control.Monad
+import Data.Either.Unwrap
+import Data.List
 import Data.Maybe
 import System.Environment
 import System.Exit
 import qualified Data.ByteString.Lazy.Char8 as L8
 
-import JSONReader
 import CodeGen
-import Validation
+import JSONReader
 import Tiling
+import UIReader
 import Utils
+import Validation
 
 main :: IO ()
 main = do
@@ -22,13 +25,17 @@ main = do
         putStrLn "Input file required"
         exitFailure
 
-    maybeView <- fromJSONFile $ fromJust maybeFilename
+    let filename = fromJust maybeFilename
 
-    unless (isJust maybeView) $ do
-        putStrLn "Parsing input file failed"
+    let parse = if ".ui" `isSuffixOf` filename then fromUIFile else fromJSONFile
+
+    eitherView <- parse $ fromJust maybeFilename
+
+    whenLeft eitherView $ \ msg -> do
+        L8.putStrLn $ L8.concat ["Parsing input file failed: ", msg]
         exitFailure
 
-    let inputView = fromJust maybeView
+    let inputView = fromRight eitherView
 
     case validateView inputView of
         Just msg -> do
@@ -47,3 +54,4 @@ main = do
     putStrLn "Implementation"
     putStrLn "=============="
     L8.putStrLn $ genImplementation templates view
+
